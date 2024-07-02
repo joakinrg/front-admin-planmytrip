@@ -19,70 +19,70 @@ const Añadir = () => {
   const passwordEx =
     /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&_#])[A-Za-z\d@$!%*?&_#]{8,}$/;
 
-  const onSubmit = handleSubmit(async (data) => {
-    if (!data.name.match(letters)) {
-      toast.error("El nombre solo puede contener letras.", {
-        duration: 1500,
-      });
-      return;
-    }
-
-    if (!data.lastname.match(letters)) {
-      toast.error("El apellido solo puede contener letras.", {
-        duration: 1500,
-      });
-      return;
-    }
-
-    if (!data.email.match(mail)) {
-      toast.error("El correo no es válido.", {
-        duration: 1500,
-      });
-      return;
-    }
-
-    if (!data.password.match(passwordEx)) {
-      toast.error(
-        "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un caracter especial.",
-        {
+    const onSubmit = handleSubmit(async (data) => {
+      if (!data.name.match(letters)) {
+        toast.error("El nombre solo puede contener letras.", {
           duration: 1500,
+        });
+        return;
+      }
+  
+      if (!data.lastname.match(letters)) {
+        toast.error("El apellido solo puede contener letras.", {
+          duration: 1500,
+        });
+        return;
+      }
+  
+      if (!data.email.match(mail)) {
+        toast.error("El correo no es válido.", {
+          duration: 1500,
+        });
+        return;
+      }
+  
+      if (!data.password.match(passwordEx)) {
+        toast.error(
+          "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un caracter especial.",
+          {
+            duration: 1500,
+          }
+        );
+        return;
+      }
+  
+      const addUser = await fetch(
+        `${process.env.NEXT_PUBLIC_SUPPORT_BACKEND_URL}/user/create`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            nombre: data.name,
+            apellido: data.lastname,
+            email: data.email,
+            password: data.password,
+          }),
         }
       );
-      return;
-    }
-
-    const addUser = await fetch(
-      `${process.env.NEXT_PUBLIC_SUPPORT_BACKEND_URL}/user/create`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          nombre: data.name,
-          apellido: data.lastname,
-          email: data.email,
-          password: data.password,
-        }),
+  
+      const addUserRes = await addUser.json();
+  
+      if (addUserRes.error) {
+        toast.error(addUserRes.message, {
+          duration: 1500,
+        });
+        return;
       }
-    );
-
-    const addUserRes = await addUser.json();
-
-    if (addUserRes.error) {
-      toast.error(addUserRes.message, {
+  
+      toast.success("Usuario agregado correctamente.", {
         duration: 1500,
+        onAutoClose: () => {
+          router.push("/admin/soporte");
+        },
       });
-      return;
-    }
-
-    toast.success("Usuario agregado correctamente.", {
-      duration: 1500,
-      onAutoClose: () => {
-        router.push("/admin/dashboard/soporte");
-      },
     });
-  });
   return (
     <div className="p-5 bg-zinc-800 rounded-lg">
       <div className="container mx-auto py-4">
